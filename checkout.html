@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>checkout</title>
+</head>
+<body>
+    <form id="pay-form">
+  <input type="text" name="first_name" placeholder="First name" required />
+  <input type="text" name="last_name" placeholder="Last name" required />
+  <input type="email" name="email" placeholder="Email" required />
+  <input type="tel" name="phone_number" placeholder="2517..." required />
+  <input type="number" name="amount" placeholder="Amount" required />
+  <select name="currency" required>
+    <option value="USD">USD</option>
+    <option value="UGX">UGX</option>
+    <option value="ETB">ETB</option>
+    <option value="DJF">DJF</option>
+  </select>
+  <button type="submit">Pay Now</button>
+</form>
+    <script>
+  document.getElementById("pay-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const form = e.target;
+    const payload = {
+      amount: Number(form.amount.value),
+      currency: form.currency.value,
+      tx_ref: "ORDER_" + Date.now(),
+      first_name: form.first_name.value,
+      last_name: form.last_name.value,
+      email: form.email.value,
+      phone_number: form.phone_number.value
+    };
+    const res = await fetch("/create-checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data?.data?.checkout_url) {
+      window.location.href = data.data.checkout_url;
+    } else {
+      alert(data?.message || data?.error || "Failed to initialize payment. Please try again.");
+    }
+  });
+</script>S
+</body>
+</html>
